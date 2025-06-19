@@ -1,0 +1,31 @@
+<!-- File: res/drawable/il_login.xml -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="261dp"
+    android:height="230dp"
+    android:viewportWidth="261"
+    android:viewportHeight="230">
+    <path
+        android:pathData="M130.5,0L261,0L261,230L0,230L0,72.71C0,72.71 49.38,-2.14 130.5,0Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="130.5"
+                android:startY="0"
+                android:endX="130.5"
+                android:endY="230"
+                android:type="linear">
+                <item android:offset="0" android:color="#3F8EAFBC"/>
+                <item android:offset="1" android:color="#00FFFFFF"/>
+            </gradient>
+        </aapt:attr>
+    </path>
+    <path
+        android:pathData="M228,114.39C228,154.55 195.96,187.39 155.5,187.39C115.04,187.39 83,154.55 83,114.39C83,74.24 115.04,41.39 155.5,41.39C195.96,41.39 228,74.24 228,114.39Z"
+        android:fillColor="#FFFFFF"/>
+    <path
+        android:pathData="M155.5,69.39C168.3,69.39 178.67,79.7 178.67,92.42C178.67,105.15 168.3,115.45 155.5,115.45C142.7,115.45 132.33,105.15 132.33,92.42C132.33,79.7 142.7,69.39 155.5,69.39Z"
+        android:fillColor="#006493"/>
+    <path
+        android:pathData="M189,152.39C189,141.28 173.88,132.39 155.5,132.39C137.12,132.39 122,141.28 122,152.39V157.39H189V152.39Z"
+        android:fillColor="#006493"/>
+</vector>
