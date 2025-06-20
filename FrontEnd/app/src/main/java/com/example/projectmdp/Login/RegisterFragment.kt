@@ -1,7 +1,6 @@
 package com.example.projectmdp.Login
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,16 +30,9 @@ class RegisterFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.btnRegister.setOnClickListener {
-            val namaLengkap = binding.etFullName.text.toString().trim()
-            val email = binding.etEmail.text.toString().trim()
-            val password = binding.etPassword.text.toString()
-            val confirmPassword = "dummy_confirm_password" // Backend Anda butuh ini, sesuaikan jika beda
-
-            val request = RegisterRequest(namaLengkap, email, password, confirmPassword)
-            authViewModel.registerUser(request)
+            registerUser()
         }
 
-        // Logika untuk kembali ke Login
         binding.tvGoToLogin.setOnClickListener {
             findNavController().navigate(R.id.action_registerFragment_to_loginFragment)
         }
@@ -48,26 +40,55 @@ class RegisterFragment : Fragment() {
         observeViewModel()
     }
 
+    private fun registerUser() {
+        val namaLengkap = binding.etFullName.text.toString().trim()
+        val email = binding.etEmail.text.toString().trim()
+        val password = binding.etPassword.text.toString()
+        val confirmPassword = binding.etPasswordConfirmation.text.toString()
+
+        // Validasi di sisi frontend terlebih dahulu
+        if (namaLengkap.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+            Toast.makeText(requireContext(), "Harap lengkapi semua data", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (password != confirmPassword) {
+            Toast.makeText(requireContext(), "Password dan konfirmasi tidak cocok", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (password.length < 6) {
+            Toast.makeText(requireContext(), "Password minimal harus 6 karakter", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Jika semua validasi lolos, baru kirim ke ViewModel
+        val request = RegisterRequest(namaLengkap, email, password, confirmPassword)
+        authViewModel.registerUser(request)
+    }
+
     private fun observeViewModel() {
         authViewModel.registrationResult.observe(viewLifecycleOwner) { result ->
             when (result) {
                 is AuthResult.Loading -> {
-                    // Tampilkan progress bar
                     binding.btnRegister.isEnabled = false
                     binding.btnRegister.text = "Loading..."
                 }
                 is AuthResult.Success -> {
                     binding.btnRegister.isEnabled = true
                     binding.btnRegister.text = "Register"
-                    Toast.makeText(requireContext(), result.data.message, Toast.LENGTH_SHORT).show()
-                    // Navigasi ke halaman login setelah berhasil
+                    Toast.makeText(requireContext(), result.data.message, Toast.LENGTH_LONG).show()
                     findNavController().navigate(R.id.action_registerFragment_to_loginFragment)
                 }
                 is AuthResult.Error -> {
                     binding.btnRegister.isEnabled = true
                     binding.btnRegister.text = "Register"
-                    Toast.makeText(requireContext(), "Error: ${result.message}", Toast.LENGTH_LONG).show()
-                    Log.e("Registration Error", result.message)
+                    val errorMessage = try {
+                        org.json.JSONObject(result.message).getString("message")
+                    } catch (e: Exception) {
+                        result.message
+                    }
+                    Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show()
                 }
             }
         }
