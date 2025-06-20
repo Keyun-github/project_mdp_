@@ -11,11 +11,13 @@ import androidx.navigation.fragment.findNavController
 import com.example.projectmdp.R
 import com.example.projectmdp.api.LoginRequest
 import com.example.projectmdp.databinding.FragmentLoginBinding
+import com.example.projectmdp.utils.SessionManager
 
 class LoginFragment : Fragment() {
 
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
+
     private val authViewModel: AuthViewModel by viewModels()
 
     override fun onCreateView(
@@ -26,18 +28,23 @@ class LoginFragment : Fragment() {
         return binding.root
     }
 
+    override fun onStart() {
+        super.onStart()
+        val token = SessionManager.getAuthToken(requireContext())
+        if (!token.isNullOrEmpty()) {
+            findNavController().navigate(R.id.action_loginFragment_to_homeUserFragment)
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Setup listener untuk tombol login
         binding.btnLogin.setOnClickListener {
-            val email = binding.etEmail.text.toString().trim()
-            val password = binding.etPassword.text.toString()
-
-            val request = LoginRequest(email, password)
-            authViewModel.loginUser(request)
+            handleLogin()
         }
 
-        // Logika untuk ke Register
+        // Setup listener untuk teks "Register"
         binding.tvGoToRegister.setOnClickListener {
             findNavController().navigate(R.id.action_loginFragment_to_registerFragment)
         }
@@ -45,28 +52,56 @@ class LoginFragment : Fragment() {
         observeViewModel()
     }
 
+    private fun handleLogin() {
+        val email = binding.etEmail.text.toString().trim()
+        val password = binding.etPassword.text.toString()
+
+        // Validasi input sederhana di sisi frontend
+        if (email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(requireContext(), "Email dan Password tidak boleh kosong", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val loginRequest = LoginRequest(email, password)
+        authViewModel.loginUser(loginRequest)
+    }
+
     private fun observeViewModel() {
         authViewModel.loginResult.observe(viewLifecycleOwner) { result ->
             when (result) {
                 is AuthResult.Loading -> {
+                    // Saat sedang loading, nonaktifkan tombol dan ubah teksnya
                     binding.btnLogin.isEnabled = false
                     binding.btnLogin.text = "Loading..."
                 }
                 is AuthResult.Success -> {
+                    // Jika berhasil, aktifkan kembali tombol
                     binding.btnLogin.isEnabled = true
                     binding.btnLogin.text = "Login"
+
+                    // Tampilkan pesan sukses dari server
                     Toast.makeText(requireContext(), result.data.message, Toast.LENGTH_SHORT).show()
 
-                    // TODO: Simpan token (misal: di SharedPreferences)
-                    // contoh: saveToken(result.data.token)
+                    // Simpan data sesi (token dan nama pengguna)
+                    val responseData = result.data
+                    SessionManager.saveAuthToken(requireContext(), responseData.token)
+                    SessionManager.saveUserName(requireContext(), responseData.user.namaLengkap)
 
-                    // TODO: Navigasi ke halaman utama aplikasi setelah login
-                    // findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
+                    // Navigasi ke halaman utama pengguna
+                    findNavController().navigate(R.id.action_loginFragment_to_homeUserFragment)
                 }
                 is AuthResult.Error -> {
+                    // Jika gagal, aktifkan kembali tombol
                     binding.btnLogin.isEnabled = true
                     binding.btnLogin.text = "Login"
-                    Toast.makeText(requireContext(), "Error: ${result.message}", Toast.LENGTH_LONG).show()
+
+                    // Coba parse pesan error dari JSON agar lebih mudah dibaca
+                    val errorMessage = try {
+                        org.json.JSONObject(result.message).getString("message")
+                    } catch (e: Exception) {
+                        result.message // Jika gagal parse, tampilkan pesan mentah
+                    }
+                    Toast.makeText(requireContext(), "Error: $errorMessage", Toast.LENGTH_LONG).show()
                 }
             }
         }
