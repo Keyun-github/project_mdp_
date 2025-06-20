@@ -3,8 +3,9 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.serialization) // Menggantikan KAPT
+    id("kotlin-kapt") // Wajib ada untuk Room Compiler
     id("androidx.navigation.safeargs.kotlin")
+    alias(libs.plugins.kotlin.serialization) // Untuk Retrofit
 }
 
 android {
@@ -68,14 +69,23 @@ dependencies {
 
     // Networking (Retrofit + Kotlinx.serialization)
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation(libs.converter.kotlinx.serialization) // Converter untuk Kotlinx
-    implementation(libs.kotlinx.serialization.json)      // Library utama Kotlinx
-
-    // Logging Interceptor (tetap berguna)
+    implementation(libs.converter.kotlinx.serialization)
+    implementation(libs.kotlinx.serialization.json)
     implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
 
     // ViewModel & LiveData
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
     implementation("androidx.fragment:fragment-ktx:1.6.2")
+
+    // Room Database
+    val room_version = "2.6.1"
+    implementation("androidx.room:room-runtime:$room_version")
+    implementation("androidx.room:room-ktx:$room_version") // Dukungan Coroutines
+    kapt("androidx.room:room-compiler:$room_version")    // Annotation Processor
+}
+
+// Konfigurasi KAPT (opsional, tapi bisa membantu mencegah error)
+kapt {
+    correctErrorTypes = true
 }

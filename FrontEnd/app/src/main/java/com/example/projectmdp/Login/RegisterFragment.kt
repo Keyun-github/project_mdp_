@@ -16,7 +16,12 @@ class RegisterFragment : Fragment() {
 
     private var _binding: FragmentRegisterBinding? = null
     private val binding get() = _binding!!
-    private val authViewModel: AuthViewModel by viewModels()
+
+    // Inisialisasi ViewModel menggunakan Factory agar bisa menerima Context
+    // untuk membuat instance AuthRepository yang terhubung ke Room.
+    private val authViewModel: AuthViewModel by viewModels {
+        AuthViewModelFactory(requireContext())
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,26 +34,37 @@ class RegisterFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Setup listener untuk tombol register
         binding.btnRegister.setOnClickListener {
-            registerUser()
+            handleRegistration()
         }
 
+        // Setup listener untuk teks "Login"
         binding.tvGoToLogin.setOnClickListener {
             findNavController().navigate(R.id.action_registerFragment_to_loginFragment)
         }
 
+        // Mulai mengamati perubahan dari ViewModel
         observeViewModel()
     }
 
-    private fun registerUser() {
+    /**
+     * Fungsi untuk menangani logika saat tombol register ditekan.
+     */
+    private fun handleRegistration() {
         val namaLengkap = binding.etFullName.text.toString().trim()
         val email = binding.etEmail.text.toString().trim()
         val password = binding.etPassword.text.toString()
         val confirmPassword = binding.etPasswordConfirmation.text.toString()
 
-        // Validasi di sisi frontend terlebih dahulu
+        // Validasi input di sisi frontend
         if (namaLengkap.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
             Toast.makeText(requireContext(), "Harap lengkapi semua data", Toast.LENGTH_SHORT).show()
+            return // Hentikan fungsi jika ada data yang kosong
+        }
+
+        if (password.length < 6) {
+            Toast.makeText(requireContext(), "Password minimal harus 6 karakter", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -57,36 +73,44 @@ class RegisterFragment : Fragment() {
             return
         }
 
-        if (password.length < 6) {
-            Toast.makeText(requireContext(), "Password minimal harus 6 karakter", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        // Jika semua validasi lolos, baru kirim ke ViewModel
+        // Jika semua validasi frontend lolos, buat request dan kirim ke ViewModel
         val request = RegisterRequest(namaLengkap, email, password, confirmPassword)
         authViewModel.registerUser(request)
     }
 
+    /**
+     * Fungsi untuk mengamati LiveData dari AuthViewModel.
+     * Ini akan bereaksi terhadap perubahan state (Loading, Success, Error).
+     */
     private fun observeViewModel() {
         authViewModel.registrationResult.observe(viewLifecycleOwner) { result ->
             when (result) {
-                is AuthResult.Loading -> {
+                is ApiResult.Loading -> {
+                    // Saat sedang loading, nonaktifkan tombol dan ubah teksnya
                     binding.btnRegister.isEnabled = false
                     binding.btnRegister.text = "Loading..."
                 }
-                is AuthResult.Success -> {
+                is ApiResult.Success -> {
+                    // Jika berhasil, aktifkan kembali tombol
                     binding.btnRegister.isEnabled = true
                     binding.btnRegister.text = "Register"
+
+                    // Tampilkan pesan sukses dari server
                     Toast.makeText(requireContext(), result.data.message, Toast.LENGTH_LONG).show()
+
+                    // Navigasi ke halaman login setelah registrasi berhasil
                     findNavController().navigate(R.id.action_registerFragment_to_loginFragment)
                 }
-                is AuthResult.Error -> {
+                is ApiResult.Error -> {
+                    // Jika gagal, aktifkan kembali tombol
                     binding.btnRegister.isEnabled = true
                     binding.btnRegister.text = "Register"
+
+                    // Coba parse pesan error dari JSON agar lebih mudah dibaca
                     val errorMessage = try {
                         org.json.JSONObject(result.message).getString("message")
                     } catch (e: Exception) {
-                        result.message
+                        result.message // Jika gagal parse, tampilkan pesan mentah
                     }
                     Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show()
                 }

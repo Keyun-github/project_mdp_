@@ -4,55 +4,53 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.projectmdp.api.*
+import com.example.projectmdp.api.GenericResponse
+import com.example.projectmdp.api.LoginRequest
+import com.example.projectmdp.api.LoginResponse
+import com.example.projectmdp.api.RegisterRequest
+import com.example.projectmdp.repository.AuthRepository
+import com.example.projectmdp.repository.ResultWrapper
 import kotlinx.coroutines.launch
 
-// Wrapper class untuk state management
-sealed class AuthResult<out T> {
-    data class Success<out T>(val data: T) : AuthResult<T>()
-    data class Error(val message: String) : AuthResult<Nothing>()
-    object Loading : AuthResult<Nothing>()
+// Ganti nama AuthResult menjadi ApiResult agar lebih jelas
+sealed class ApiResult<out T> {
+    data class Success<out T>(val data: T) : ApiResult<T>()
+    data class Error(val message: String) : ApiResult<Nothing>()
+    object Loading : ApiResult<Nothing>()
 }
 
-class AuthViewModel : ViewModel() {
+class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
 
-    private val _registrationResult = MutableLiveData<AuthResult<GenericResponse>>()
-    val registrationResult: LiveData<AuthResult<GenericResponse>> = _registrationResult
+    private val _registrationResult = MutableLiveData<ApiResult<GenericResponse>>()
+    val registrationResult: LiveData<ApiResult<GenericResponse>> = _registrationResult
 
-    private val _loginResult = MutableLiveData<AuthResult<LoginResponse>>()
-    val loginResult: LiveData<AuthResult<LoginResponse>> = _loginResult
+    private val _loginResult = MutableLiveData<ApiResult<LoginResponse>>()
+    val loginResult: LiveData<ApiResult<LoginResponse>> = _loginResult
 
     fun registerUser(request: RegisterRequest) {
         viewModelScope.launch {
-            _registrationResult.value = AuthResult.Loading
-            try {
-                val response = RetrofitClient.instance.registerUser(request)
-                if (response.isSuccessful && response.body() != null) {
-                    _registrationResult.value = AuthResult.Success(response.body()!!)
-                } else {
-                    // Coba parsing error body jika ada
-                    val errorMsg = response.errorBody()?.string() ?: "Registrasi gagal"
-                    _registrationResult.value = AuthResult.Error(errorMsg)
+            _registrationResult.value = ApiResult.Loading
+            when (val result = repository.register(request)) {
+                is ResultWrapper.Success -> {
+                    _registrationResult.value = ApiResult.Success(result.data)
+                    // Setelah registrasi sukses, kita login diam-diam untuk dapat data user
+                    // dan menyimpannya ke Room.
+                    val loginRequest = LoginRequest(request.email, request.password)
+                    repository.loginAndCacheUser(loginRequest) // Ini akan menyimpan ke Room
                 }
-            } catch (e: Exception) {
-                _registrationResult.value = AuthResult.Error(e.message ?: "Terjadi kesalahan jaringan")
+                is ResultWrapper.Error -> {
+                    _registrationResult.value = ApiResult.Error(result.message)
+                }
             }
         }
     }
 
     fun loginUser(request: LoginRequest) {
         viewModelScope.launch {
-            _loginResult.value = AuthResult.Loading
-            try {
-                val response = RetrofitClient.instance.loginUser(request)
-                if (response.isSuccessful && response.body() != null) {
-                    _loginResult.value = AuthResult.Success(response.body()!!)
-                } else {
-                    val errorMsg = response.errorBody()?.string() ?: "Login gagal"
-                    _loginResult.value = AuthResult.Error(errorMsg)
-                }
-            } catch (e: Exception) {
-                _loginResult.value = AuthResult.Error(e.message ?: "Terjadi kesalahan jaringan")
+            _loginResult.value = ApiResult.Loading
+            when (val result = repository.loginAndCacheUser(request)) {
+                is ResultWrapper.Success -> _loginResult.value = ApiResult.Success(result.data)
+                is ResultWrapper.Error -> _loginResult.value = ApiResult.Error(result.message)
             }
         }
     }

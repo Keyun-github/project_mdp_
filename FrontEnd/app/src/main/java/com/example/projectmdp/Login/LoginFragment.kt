@@ -18,7 +18,11 @@ class LoginFragment : Fragment() {
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
 
-    private val authViewModel: AuthViewModel by viewModels()
+    // Inisialisasi ViewModel menggunakan Factory agar bisa menerima Context
+    // untuk membuat instance AuthRepository yang terhubung ke Room.
+    private val authViewModel: AuthViewModel by viewModels {
+        AuthViewModelFactory(requireContext())
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -30,6 +34,7 @@ class LoginFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
+        // Cek jika user sudah login sebelumnya
         val token = SessionManager.getAuthToken(requireContext())
         if (!token.isNullOrEmpty()) {
             findNavController().navigate(R.id.action_loginFragment_to_homeUserFragment)
@@ -39,12 +44,10 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Setup listener untuk tombol login
         binding.btnLogin.setOnClickListener {
             handleLogin()
         }
 
-        // Setup listener untuk teks "Register"
         binding.tvGoToRegister.setOnClickListener {
             findNavController().navigate(R.id.action_loginFragment_to_registerFragment)
         }
@@ -56,7 +59,6 @@ class LoginFragment : Fragment() {
         val email = binding.etEmail.text.toString().trim()
         val password = binding.etPassword.text.toString()
 
-        // Validasi input sederhana di sisi frontend
         if (email.isEmpty() || password.isEmpty()) {
             Toast.makeText(requireContext(), "Email dan Password tidak boleh kosong", Toast.LENGTH_SHORT).show()
             return
@@ -66,40 +68,40 @@ class LoginFragment : Fragment() {
         authViewModel.loginUser(loginRequest)
     }
 
+    /**
+     * Fungsi untuk mengamati LiveData dari AuthViewModel.
+     * Ini akan bereaksi terhadap perubahan state (Loading, Success, Error).
+     * Bagian inilah yang diperbaiki untuk mengatasi error 'when' expression must be exhaustive.
+     */
     private fun observeViewModel() {
+        // Pastikan untuk mengamati loginResult, bukan registrationResult
         authViewModel.loginResult.observe(viewLifecycleOwner) { result ->
+            // Gunakan nama sealed class yang benar: ApiResult
             when (result) {
-                is AuthResult.Loading -> {
-                    // Saat sedang loading, nonaktifkan tombol dan ubah teksnya
+                is ApiResult.Loading -> {
                     binding.btnLogin.isEnabled = false
                     binding.btnLogin.text = "Loading..."
                 }
-                is AuthResult.Success -> {
-                    // Jika berhasil, aktifkan kembali tombol
+                is ApiResult.Success -> {
                     binding.btnLogin.isEnabled = true
                     binding.btnLogin.text = "Login"
 
-                    // Tampilkan pesan sukses dari server
                     Toast.makeText(requireContext(), result.data.message, Toast.LENGTH_SHORT).show()
 
-                    // Simpan data sesi (token dan nama pengguna)
                     val responseData = result.data
                     SessionManager.saveAuthToken(requireContext(), responseData.token)
                     SessionManager.saveUserName(requireContext(), responseData.user.namaLengkap)
 
-                    // Navigasi ke halaman utama pengguna
                     findNavController().navigate(R.id.action_loginFragment_to_homeUserFragment)
                 }
-                is AuthResult.Error -> {
-                    // Jika gagal, aktifkan kembali tombol
+                is ApiResult.Error -> {
                     binding.btnLogin.isEnabled = true
                     binding.btnLogin.text = "Login"
 
-                    // Coba parse pesan error dari JSON agar lebih mudah dibaca
                     val errorMessage = try {
                         org.json.JSONObject(result.message).getString("message")
                     } catch (e: Exception) {
-                        result.message // Jika gagal parse, tampilkan pesan mentah
+                        result.message
                     }
                     Toast.makeText(requireContext(), "Error: $errorMessage", Toast.LENGTH_LONG).show()
                 }
