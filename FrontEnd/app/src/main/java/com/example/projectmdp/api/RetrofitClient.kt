@@ -9,8 +9,6 @@ import retrofit2.Retrofit
 
 object RetrofitClient {
 
-    private const val BASE_URL = "http:/192.168.101.86:3000/"
-
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
     }
@@ -21,12 +19,25 @@ object RetrofitClient {
 
     private val json = Json { ignoreUnknownKeys = true }
 
+    private const val APP_BASE_URL = "http://192.168.101.86:3000/"
+
     val instance: ApiService by lazy {
-        val retrofit = Retrofit.Builder()
-            .baseUrl(BASE_URL)
+        Retrofit.Builder()
+            .baseUrl(APP_BASE_URL)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .client(okHttpClient)
             .build()
-        retrofit.create(ApiService::class.java)
+            .create(ApiService::class.java)
+    }
+
+    private const val HF_BASE_URL = "https://api-inference.huggingface.co/"
+
+    val hfInstance: HuggingFaceApiService by lazy {
+        Retrofit.Builder()
+            .baseUrl(HF_BASE_URL)
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .client(okHttpClient)
+            .build()
+            .create(HuggingFaceApiService::class.java)
     }
 }

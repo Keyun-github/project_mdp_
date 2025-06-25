@@ -1,7 +1,10 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    id("com.google.devtools.ksp") // Menggunakan KSP
+    id("com.google.devtools.ksp")
     id("androidx.navigation.safeargs.kotlin")
     alias(libs.plugins.kotlin.serialization)
 }
@@ -17,6 +20,14 @@ android {
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Mengambil Token Hugging Face dari local.properties
+        val localProperties = Properties()
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localProperties.load(FileInputStream(localPropertiesFile))
+        }
+        buildConfigField("String", "HUGGING_FACE_TOKEN", "\"${localProperties.getProperty("HUGGING_FACE_TOKEN", "")}\"")
     }
 
     buildTypes {
@@ -38,6 +49,7 @@ android {
 
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 
     packagingOptions {
@@ -80,5 +92,8 @@ dependencies {
     val room_version = "2.6.1"
     implementation("androidx.room:room-runtime:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
-    ksp("androidx.room:room-compiler:$room_version") // Menggunakan KSP untuk Room
+    ksp("androidx.room:room-compiler:$room_version")
+
+    // HAPUS DEPENDENSI GOOGLE AI
+    // implementation("com.google.ai.client.generativeai:generativeai:0.4.0")
 }
