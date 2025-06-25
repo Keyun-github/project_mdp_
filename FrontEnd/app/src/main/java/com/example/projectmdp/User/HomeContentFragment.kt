@@ -5,31 +5,31 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.setupWithNavController
+import androidx.navigation.fragment.findNavController
 import com.example.projectmdp.R
-import com.example.projectmdp.databinding.FragmentHomeUserBinding
+import com.example.projectmdp.databinding.FragmentHomeContentBinding
 
-class HomeUserFragment : Fragment() {
+class HomeContentFragment : Fragment() {
 
-    private var _binding: FragmentHomeUserBinding? = null
+    private var _binding: FragmentHomeContentBinding? = null
     private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentHomeUserBinding.inflate(inflater, container, false)
+        _binding = FragmentHomeContentBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val navHostFragment = childFragmentManager.findFragmentById(R.id.home_nav_host_fragment) as NavHostFragment
-        val navController = navHostFragment.navController
-
-        binding.bottomNavigationView.setupWithNavController(navController)
+        // Setup listener untuk FloatingActionButton
+        binding.fabAddDonation.setOnClickListener {
+            // Gunakan action yang sudah kita definisikan di nav graph
+            findNavController().navigate(R.id.action_homeContentFragment_to_addDonationFragment)
+        }
     }
 
     override fun onDestroyView() {

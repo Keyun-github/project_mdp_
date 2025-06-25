@@ -6,26 +6,27 @@
     android:layout_height="match_parent"
     tools:context=".User.HomeUserFragment">
 
-    <TextView
-        android:id="@+id/tvWelcomeMessage"
-        android:layout_width="wrap_content"
+    <!-- Container untuk menampilkan fragment-fragment (Home, AI, Profile) -->
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/home_nav_host_fragment"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:defaultNavHost="true"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_navigation_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navGraph="@navigation/home_nav_graph" /> <!-- Menggunakan nav graph baru -->
+
+    <!-- Menu Navigasi Bawah -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation_view"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Selamat Datang, User!"
-        android:textSize="24sp"
-        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/btnLogout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="Logout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvWelcomeMessage" />
+        app:menu="@menu/bottom_nav_menu" /> <!-- Menggunakan menu yang kita buat -->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

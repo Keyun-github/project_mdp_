@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/home_nav_graph"
+    app:startDestination="@id/homeContentFragment">
+
+    <fragment
+        android:id="@+id/homeContentFragment"
+        android:name="com.example.projectmdp.User.HomeContentFragment"
+        android:label="fragment_home_content"
+        tools:layout="@layout/fragment_home_content" >
+        <action
+            android:id="@+id/action_homeContentFragment_to_addDonationFragment"
+            app:destination="@id/addDonationFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/AIFragment"
+        android:name="com.example.projectmdp.User.AIFragment"
+        android:label="fragment_a_i"
+        tools:layout="@layout/fragment_ai" />
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.projectmdp.User.ProfileFragment"
+        android:label="fragment_profile"
+        tools:layout="@layout/fragment_profile" />
+
+    <fragment
+        android:id="@+id/addDonationFragment"
+        android:name="com.example.projectmdp.User.AddDonationFragment"
+        android:label="fragment_add_donation"
+        tools:layout="@layout/fragment_add_donation" />
+</navigation>

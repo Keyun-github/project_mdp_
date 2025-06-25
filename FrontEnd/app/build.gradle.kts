@@ -83,6 +83,8 @@ dependencies {
     implementation("androidx.room:room-runtime:$room_version")
     implementation("androidx.room:room-ktx:$room_version") // Dukungan Coroutines
     kapt("androidx.room:room-compiler:$room_version")    // Annotation Processor
+
+    implementation("com.google.android.material:material:1.12.0")
 }
 
 // Konfigurasi KAPT (opsional, tapi bisa membantu mencegah error)
