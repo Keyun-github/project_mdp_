@@ -1,11 +1,9 @@
-// File: app/build.gradle.kts
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    id("kotlin-kapt") // Wajib ada untuk Room Compiler
+    id("com.google.devtools.ksp") // Menggunakan KSP
     id("androidx.navigation.safeargs.kotlin")
-    alias(libs.plugins.kotlin.serialization) // Untuk Retrofit
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -81,13 +79,6 @@ dependencies {
     // Room Database
     val room_version = "2.6.1"
     implementation("androidx.room:room-runtime:$room_version")
-    implementation("androidx.room:room-ktx:$room_version") // Dukungan Coroutines
-    kapt("androidx.room:room-compiler:$room_version")    // Annotation Processor
-
-    implementation("com.google.android.material:material:1.12.0")
-}
-
-// Konfigurasi KAPT (opsional, tapi bisa membantu mencegah error)
-kapt {
-    correctErrorTypes = true
+    implementation("androidx.room:room-ktx:$room_version")
+    ksp("androidx.room:room-compiler:$room_version") // Menggunakan KSP untuk Room
 }

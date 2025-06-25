@@ -12,7 +12,7 @@ import com.example.projectmdp.repository.AuthRepository
 import com.example.projectmdp.repository.ResultWrapper
 import kotlinx.coroutines.launch
 
-// Ganti nama AuthResult menjadi ApiResult agar lebih jelas
+// Sealed class untuk merepresentasikan state UI
 sealed class ApiResult<out T> {
     data class Success<out T>(val data: T) : ApiResult<T>()
     data class Error(val message: String) : ApiResult<Nothing>()
@@ -30,17 +30,16 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
     fun registerUser(request: RegisterRequest) {
         viewModelScope.launch {
             _registrationResult.value = ApiResult.Loading
-            when (val result = repository.register(request)) {
-                is ResultWrapper.Success -> {
-                    _registrationResult.value = ApiResult.Success(result.data)
-                    // Setelah registrasi sukses, kita login diam-diam untuk dapat data user
-                    // dan menyimpannya ke Room.
-                    val loginRequest = LoginRequest(request.email, request.password)
-                    repository.loginAndCacheUser(loginRequest) // Ini akan menyimpan ke Room
-                }
-                is ResultWrapper.Error -> {
-                    _registrationResult.value = ApiResult.Error(result.message)
-                }
+
+            val result = repository.register(request)
+
+            if (result is ResultWrapper.Success) {
+                _registrationResult.value = ApiResult.Success(result.data)
+                // Lakukan login otomatis di background untuk menyimpan data ke Room
+                val loginRequest = LoginRequest(request.email, request.password)
+                repository.loginAndCacheUser(loginRequest)
+            } else if (result is ResultWrapper.Error) {
+                _registrationResult.value = ApiResult.Error(result.message)
             }
         }
     }
@@ -48,9 +47,13 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
     fun loginUser(request: LoginRequest) {
         viewModelScope.launch {
             _loginResult.value = ApiResult.Loading
-            when (val result = repository.loginAndCacheUser(request)) {
-                is ResultWrapper.Success -> _loginResult.value = ApiResult.Success(result.data)
-                is ResultWrapper.Error -> _loginResult.value = ApiResult.Error(result.message)
+
+            val result = repository.loginAndCacheUser(request)
+
+            if (result is ResultWrapper.Success) {
+                _loginResult.value = ApiResult.Success(result.data)
+            } else if (result is ResultWrapper.Error) {
+                _loginResult.value = ApiResult.Error(result.message)
             }
         }
     }

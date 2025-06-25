@@ -1,4 +1,3 @@
-// com/example/projectmdp/User/AddDonationFragment.kt
 package com.example.projectmdp.User
 
 import android.os.Bundle
@@ -6,15 +5,23 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.NavigationUI
+import com.example.projectmdp.Login.ApiResult
 import com.example.projectmdp.databinding.FragmentAddDonationBinding
+import com.example.projectmdp.api.CreateDonationRequest
+import com.example.projectmdp.utils.SessionManager
 
 class AddDonationFragment : Fragment() {
 
     private var _binding: FragmentAddDonationBinding? = null
     private val binding get() = _binding!!
+    private val viewModel: DonationViewModel by viewModels {
+        DonationViewModelFactory(requireContext())
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -26,18 +33,36 @@ class AddDonationFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        // Setup Toolbar sebagai ActionBar
         setupToolbar()
-    }
 
+        binding.btnSaveDonation.setOnClickListener {
+            val title = binding.etDonationTitle.text.toString().trim()
+            val targetStr = binding.etDonationTarget.text.toString().trim()
+            val creatorName = SessionManager.getUserName(requireContext()) ?: "Anonim"
+
+            if(title.isEmpty() || targetStr.isEmpty()) {
+                Toast.makeText(context, "Semua field harus diisi", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val request = CreateDonationRequest(title, targetStr.toLong(), creatorName)
+            viewModel.addNewDonation(request)
+        }
+
+        viewModel.createStatus.observe(viewLifecycleOwner) { result ->
+            when(result) {
+                is ApiResult.Success -> {
+                    Toast.makeText(context, "Donasi berhasil dibuat!", Toast.LENGTH_SHORT).show()
+                    findNavController().popBackStack()
+                }
+                is ApiResult.Error -> Toast.makeText(context, "Error: ${result.message}", Toast.LENGTH_SHORT).show()
+                ApiResult.Loading -> { /* Show loading indicator */ }
+            }
+        }
+    }
     private fun setupToolbar() {
-        // Kita perlu mengubah activity menjadi AppCompatActivity untuk bisa mengatur ActionBar
         (activity as? AppCompatActivity)?.setSupportActionBar(binding.toolbarAddDonation)
 
-        // Hubungkan NavController dengan Toolbar.
-        // Ini akan secara otomatis menampilkan tombol back (up button) dan
-        // menangani aksinya untuk kembali ke fragment sebelumnya.
         NavigationUI.setupWithNavController(binding.toolbarAddDonation, findNavController())
     }
 

@@ -1,16 +1,22 @@
 package com.example.projectmdp.repository
 
 import android.content.Context
-import com.example.projectmdp.api.*
+import com.example.projectmdp.api.ApiService
+import com.example.projectmdp.api.GenericResponse
+import com.example.projectmdp.api.LoginRequest
+import com.example.projectmdp.api.LoginResponse
+import com.example.projectmdp.api.RegisterRequest
+import com.example.projectmdp.api.RetrofitClient
+import com.example.projectmdp.api.UserData
 import com.example.projectmdp.db.AppDatabase
+import com.example.projectmdp.db.UserDao
 import com.example.projectmdp.db.UserEntity
 
 class AuthRepository(context: Context) {
 
-    private val apiService = RetrofitClient.instance
-    private val userDao = AppDatabase.getDatabase(context).userDao()
+    private val apiService: ApiService = RetrofitClient.instance
+    private val userDao: UserDao = AppDatabase.getDatabase(context).userDao()
 
-    // Fungsi untuk registrasi
     suspend fun register(request: RegisterRequest): ResultWrapper<GenericResponse> {
         return try {
             val response = apiService.registerUser(request)
@@ -25,7 +31,6 @@ class AuthRepository(context: Context) {
         }
     }
 
-    // Fungsi untuk login dan menyimpan data ke Room
     suspend fun loginAndCacheUser(request: LoginRequest): ResultWrapper<LoginResponse> {
         return try {
             val response = apiService.loginUser(request)
@@ -43,7 +48,6 @@ class AuthRepository(context: Context) {
         }
     }
 
-    // Fungsi untuk menyimpan user ke Room
     private suspend fun cacheUser(userData: UserData) {
         val userEntity = UserEntity(
             serverId = userData.id,
@@ -55,14 +59,7 @@ class AuthRepository(context: Context) {
         userDao.insertUser(userEntity)
     }
 
-    // Fungsi untuk mendapatkan user dari Room
     suspend fun getCachedUserByEmail(email: String): UserEntity? {
         return userDao.getUserByEmail(email)
     }
-}
-
-// Wrapper class untuk hasil, agar lebih rapi
-sealed class ResultWrapper<out T> {
-    data class Success<out T>(val data: T) : ResultWrapper<T>()
-    data class Error(val message: String) : ResultWrapper<Nothing>()
 }
