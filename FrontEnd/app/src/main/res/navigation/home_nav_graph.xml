@@ -13,6 +13,10 @@
         <action
             android:id="@+id/action_homeContentFragment_to_addDonationFragment"
             app:destination="@id/addDonationFragment" />
+        <!-- Aksi baru untuk pindah ke halaman detail -->
+        <action
+            android:id="@+id/action_homeContentFragment_to_donationDetailFragment"
+            app:destination="@id/donationDetailFragment" />
     </fragment>
     <fragment
         android:id="@+id/AIFragment"
@@ -38,4 +42,16 @@
         android:name="com.example.projectmdp.User.EditProfileFragment"
         android:label="fragment_edit_profile"
         tools:layout="@layout/fragment_edit_profile" />
+
+    <!-- Deklarasi fragment detail baru -->
+    <fragment
+        android:id="@+id/donationDetailFragment"
+        android:name="com.example.projectmdp.User.DonationDetailFragment"
+        android:label="Detail Donasi"
+        tools:layout="@layout/fragment_donation_detail">
+        <!-- Argumen untuk mengirim ID donasi -->
+        <argument
+            android:name="donationId"
+            app:argType="string" />
+    </fragment>
 </navigation>

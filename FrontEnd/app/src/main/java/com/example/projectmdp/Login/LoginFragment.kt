@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -18,8 +19,7 @@ class LoginFragment : Fragment() {
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
 
-    // Inisialisasi ViewModel menggunakan Factory agar bisa menerima Context
-    // untuk membuat instance AuthRepository yang terhubung ke Room.
+    // Inisialisasi ViewModel menggunakan Factory
     private val authViewModel: AuthViewModel by viewModels {
         AuthViewModelFactory(requireContext())
     }
@@ -34,7 +34,8 @@ class LoginFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        // Cek jika user sudah login sebelumnya
+        // Cek jika pengguna sudah memiliki sesi (token) yang tersimpan.
+        // Jika ya, langsung navigasi ke home tanpa perlu login ulang.
         val token = SessionManager.getAuthToken(requireContext())
         if (!token.isNullOrEmpty()) {
             findNavController().navigate(R.id.action_loginFragment_to_homeUserFragment)
@@ -68,36 +69,38 @@ class LoginFragment : Fragment() {
         authViewModel.loginUser(loginRequest)
     }
 
-    /**
-     * Fungsi untuk mengamati LiveData dari AuthViewModel.
-     * Ini akan bereaksi terhadap perubahan state (Loading, Success, Error).
-     * Bagian inilah yang diperbaiki untuk mengatasi error 'when' expression must be exhaustive.
-     */
     private fun observeViewModel() {
-        // Pastikan untuk mengamati loginResult, bukan registrationResult
         authViewModel.loginResult.observe(viewLifecycleOwner) { result ->
-            // Gunakan nama sealed class yang benar: ApiResult
-            when (result) {
-                is ApiResult.Loading -> {
-                    binding.btnLogin.isEnabled = false
-                    binding.btnLogin.text = "Loading..."
-                }
-                is ApiResult.Success -> {
-                    binding.btnLogin.isEnabled = true
-                    binding.btnLogin.text = "Login"
+            // Mengatur visibilitas tombol dan input field berdasarkan state
+            val isLoading = result is ApiResult.Loading
+            binding.btnLogin.isEnabled = !isLoading
+            binding.tilEmail.isEnabled = !isLoading
+            binding.tilPassword.isEnabled = !isLoading
+            // Anda bisa menambahkan ProgressBar dan menampilkannya di sini jika mau
+            // binding.progressBar.isVisible = isLoading
 
+            if (isLoading) {
+                binding.btnLogin.text = "Loading..."
+            } else {
+                binding.btnLogin.text = "Login"
+            }
+
+            when (result) {
+                is ApiResult.Success -> {
                     Toast.makeText(requireContext(), result.data.message, Toast.LENGTH_SHORT).show()
 
+                    // Simpan semua data sesi yang relevan
                     val responseData = result.data
                     SessionManager.saveAuthToken(requireContext(), responseData.token)
+                    SessionManager.saveUserId(requireContext(), responseData.user.id)
                     SessionManager.saveUserName(requireContext(), responseData.user.namaLengkap)
+                    SessionManager.saveUserEmail(requireContext(), responseData.user.email)
 
+                    // Navigasi ke halaman utama pengguna
                     findNavController().navigate(R.id.action_loginFragment_to_homeUserFragment)
                 }
                 is ApiResult.Error -> {
-                    binding.btnLogin.isEnabled = true
-                    binding.btnLogin.text = "Login"
-
+                    // Coba parse pesan error dari JSON agar lebih mudah dibaca
                     val errorMessage = try {
                         org.json.JSONObject(result.message).getString("message")
                     } catch (e: Exception) {
@@ -105,6 +108,8 @@ class LoginFragment : Fragment() {
                     }
                     Toast.makeText(requireContext(), "Error: $errorMessage", Toast.LENGTH_LONG).show()
                 }
+                // Kasus Loading sudah ditangani di atas
+                is ApiResult.Loading -> { }
             }
         }
     }
