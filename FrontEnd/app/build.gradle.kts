@@ -57,6 +57,11 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
@@ -96,4 +101,36 @@ dependencies {
 
     // HAPUS DEPENDENSI GOOGLE AI
     // implementation("com.google.ai.client.generativeai:generativeai:0.4.0")
+
+    //tambahan meme
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
+
+    // --- INSTRUMENTED UI TESTING (androidTest) ---
+
+    // 1. Tambahkan Espresso BOM (Bill of Materials)
+    // Ini akan mengelola versi untuk semua library di bawahnya agar kompatibel.
+    val espresso_version = "3.5.1"
+    androidTestImplementation(platform("androidx.test.espresso:espresso-bom:$espresso_version"))
+
+    // 2. Tambahkan dependensi TANPA MENYEBUTKAN VERSI
+    // Versi akan diambil secara otomatis dari BOM di atas.
+    androidTestImplementation("androidx.test.espresso:espresso-core")
+    androidTestImplementation("androidx.test.espresso:espresso-contrib") // Sering berguna juga
+    androidTestImplementation("androidx.test.espresso:espresso-intents") // Sering berguna juga
+
+    // 3. Tambahkan dependensi lain dengan versi yang spesifik dan stabil
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test:runner:1.5.2")
+    androidTestImplementation("androidx.test:rules:1.5.0")
+
+    // Library untuk testing Fragment
+    debugImplementation("androidx.fragment:fragment-testing:1.6.2")
+
+    // Library untuk testing Navigation Component
+    androidTestImplementation("androidx.navigation:navigation-testing:2.7.7")
+
+    // Opsional: Hamcrest matchers
+    androidTestImplementation("org.hamcrest:hamcrest-library:1.3")
 }

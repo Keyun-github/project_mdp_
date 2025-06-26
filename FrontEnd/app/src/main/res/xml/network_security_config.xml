@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
     <domain-config cleartextTrafficPermitted="true">
+        //kelun
         <domain includeSubdomains="true">192.168.101.86</domain>
+        //meme
+        <domain includeSubdomains="true">192.168.100.236</domain>
     </domain-config>
 </network-security-config>

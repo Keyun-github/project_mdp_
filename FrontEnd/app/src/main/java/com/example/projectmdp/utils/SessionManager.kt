@@ -35,9 +35,10 @@ object SessionManager {
     }
 
 
-    fun clearSession(context: Context) {
+    fun clearAuthToken(context: Context) {
         val editor = getPreferences(context).edit()
-        editor.clear()
+        editor.remove(KEY_AUTH_TOKEN)
+        editor.remove(KEY_USER_NAME)
         editor.apply()
     }
 }

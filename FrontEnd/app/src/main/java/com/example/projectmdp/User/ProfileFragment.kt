@@ -37,7 +37,7 @@ class ProfileFragment : Fragment() {
         // Setup listener untuk tombol logout
         binding.btnLogout.setOnClickListener {
             // Hapus sesi/token
-            SessionManager.clearSession(requireContext())
+            SessionManager.clearAuthToken(requireContext())
 
             requireActivity().findNavController(R.id.nav_host_fragment)
                 .navigate(R.id.action_homeUserFragment_to_loginFragment)
