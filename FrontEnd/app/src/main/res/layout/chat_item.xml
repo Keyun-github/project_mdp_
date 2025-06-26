@@ -1,24 +1,106 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Menggunakan MaterialCardView untuk dukungan 'stroke' (garis tepi) yang lebih baik -->
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="8dp">
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="8dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    app:strokeColor="#E0E0E0"
+    app:strokeWidth="1dp">
 
-    <TextView
-        android:id="@+id/tv_role"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?attr/textAppearanceLabelMedium"
-        android:textStyle="bold"
-        android:text="Role" />
-
-    <TextView
-        android:id="@+id/tv_message"
+    <!-- Menggunakan ConstraintLayout untuk penataan yang lebih presisi, seperti halaman Login -->
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:textAppearance="?attr/textAppearanceBodyMedium"
-        android:text="Message content"
-        android:textColor="?attr/colorOnSurface" />
-</LinearLayout>
+        android:padding="16dp">
+
+        <!-- ID ASLI DIPERTAHANKAN: tv_role -->
+        <!-- Disederhanakan: Ikon sekarang menjadi bagian dari TextView -->
+        <TextView
+            android:id="@+id/tv_role"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:drawablePadding="12dp"
+            android:gravity="center_vertical"
+            android:text="Role"
+            android:textAppearance="?attr/textAppearanceTitleSmall"
+            android:textColor="@color/md_theme_text_primary"
+            android:textStyle="bold"
+            app:drawableStartCompat="@drawable/ic_dot_indicator"
+            app:layout_constraintEnd_toStartOf="@+id/ivMessageStatus"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- ImageView opsional, sekarang terikat ke kanan atas -->
+        <ImageView
+            android:id="@+id/ivMessageStatus"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="8dp"
+            android:alpha="0.7"
+            android:src="@drawable/ic_message_status"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_role"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tv_role"
+            app:layout_constraintTop_toTopOf="@+id/tv_role"
+            tools:visibility="visible" />
+
+        <!-- ID ASLI DIPERTAHANKAN: tv_message -->
+        <!-- Disederhanakan: Tidak perlu background dan padding tambahan -->
+        <TextView
+            android:id="@+id/tv_message"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:lineSpacingMultiplier="1.2"
+            android:text="Message content that might be a bit longer and wrap to multiple lines to see how it looks."
+            android:textColor="@color/md_theme_text_secondary"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_role" />
+
+        <!-- Area tombol aksi, tetap tersembunyi secara default -->
+        <!-- Diletakkan di bawah pesan untuk alur baca yang alami -->
+        <LinearLayout
+            android:id="@+id/llActionButtons"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="end"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_message"
+            tools:visibility="visible">
+
+            <com.google.android.material.button.MaterialButton
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="Copy"
+                android:textSize="12sp" />
+
+            <com.google.android.material.button.MaterialButton
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Share"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

@@ -4,87 +4,201 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context=".User.DonationDetailFragment">
 
+    <!-- AppBar & Toolbar dipertahankan untuk fungsionalitas, tapi dibuat tidak terlihat -->
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        app:elevation="0dp">
 
+        <!-- ID ASLI: toolbar_donation_detail -->
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar_donation_detail"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:titleTextColor="?attr/colorOnPrimary"
-            tools:title="Detail Penggalangan Dana" />
+            app:navigationIcon="@drawable/ic_arrow_back"
+            app:title="" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
+    <!-- Konten utama sekarang mengisi seluruh layar -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clipToPadding="false"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="24dp">
+            android:paddingBottom="32dp">
 
+            <!-- Guideline untuk padding horizontal yang konsisten -->
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guidelineStart"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_begin="24dp" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guidelineEnd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_end="24dp" />
+
+            <!-- Header Halaman -->
+            <!-- ID ASLI: tv_detail_title -->
             <TextView
                 android:id="@+id/tv_detail_title"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textAppearance="?attr/textAppearanceHeadline5"
+                android:layout_marginTop="?attr/actionBarSize"
+                android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                android:textColor="@color/md_theme_text_primary"
                 android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
+                app:layout_constraintStart_toStartOf="@id/guidelineStart"
+                app:layout_constraintTop_toTopOf="parent"
                 tools:text="Bantu Korban Banjir Bandang di Garut Selatan" />
 
+            <!-- ID ASLI: tv_detail_creator -->
             <TextView
                 android:id="@+id/tv_detail_creator"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:textAppearance="?attr/textAppearanceBody2"
-                android:textColor="?android:attr/textColorSecondary"
-                tools:text="oleh: John Doe" />
+                android:layout_marginTop="12dp"
+                android:drawablePadding="8dp"
+                android:gravity="center_vertical"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="@color/md_theme_text_secondary"
+                app:drawableStartCompat="@drawable/ic_creator"
+                app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
+                app:layout_constraintStart_toStartOf="@id/guidelineStart"
+                app:layout_constraintTop_toBottomOf="@+id/tv_detail_title"
+                tools:text="Oleh: John Doe" />
 
-            <ProgressBar
-                android:id="@+id/pb_detail_progress"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
+            <!-- Card Informasi Dana, di-style ulang agar flat -->
+            <!-- ID ASLI: card_financials -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_financials"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:progressTint="?attr/colorPrimary"
-                tools:max="10000000"
-                tools:progress="4000000" />
+                app:cardBackgroundColor="@color/white"
+                app:cardElevation="0dp"
+                app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
+                app:layout_constraintStart_toStartOf="@id/guidelineStart"
+                app:layout_constraintTop_toBottomOf="@+id/tv_detail_creator"
+                app:strokeColor="#E0E0E0"
+                app:strokeWidth="1dp">
 
-            <TextView
-                android:id="@+id/tv_detail_amount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:textAppearance="?attr/textAppearanceBody2"
-                android:textStyle="bold"
-                tools:text="Rp 4.000.000 terkumpul dari Rp 10.000.000" />
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp">
 
+                    <!-- ID dan konten di dalam card dipertahankan, hanya styling -->
+                    <TextView
+                        android:id="@+id/label_collected"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Dana Terkumpul"
+                        android:textAppearance="?attr/textAppearanceLabelMedium"
+                        android:textColor="@color/md_theme_text_secondary"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/tv_detail_amount"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                        android:textColor="@color/md_theme_primary"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/label_collected"
+                        tools:text="Rp 4.000.000" />
+
+                    <com.google.android.material.progressindicator.LinearProgressIndicator
+                        android:id="@+id/pb_detail_progress"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        app:indicatorColor="@color/md_theme_primary"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/tv_detail_amount"
+                        app:trackColor="#E0E0E0"
+                        app:trackCornerRadius="8dp"
+                        tools:max="10000000"
+                        tools:progress="4000000" />
+
+                    <TextView
+                        android:id="@+id/label_target"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textAppearance="?attr/textAppearanceBodySmall"
+                        android:textColor="@color/md_theme_text_secondary"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/pb_detail_progress"
+                        tools:text="dari target Rp 10.000.000" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Status Donasi, di-style ulang agar lebih bersih -->
+            <!-- ID ASLI: tv_donation_status -->
             <TextView
                 android:id="@+id/tv_donation_status"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:background="@drawable/bg_status_closed"
-                android:gravity="center"
-                android:padding="8dp"
+                android:layout_marginTop="24dp"
+                android:background="@drawable/bg_status_rounded"
+                android:drawablePadding="12dp"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="12dp"
                 android:text="PENGGALANGAN DANA DITUTUP"
-                android:textColor="@color/design_default_color_error"
-                android:textStyle="bold"
+                android:textAppearance="?attr/textAppearanceLabelLarge"
+                android:textColor="?attr/colorOnErrorContainer"
                 android:visibility="gone"
+                app:drawableStartCompat="@drawable/ic_lock"
+                app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
+                app:layout_constraintStart_toStartOf="@id/guidelineStart"
+                app:layout_constraintTop_toBottomOf="@+id/card_financials"
                 tools:visibility="visible" />
 
-        </LinearLayout>
+            <!-- Tombol Aksi, dipindahkan ke dalam area scroll -->
+            <!-- ID ASLI: btn_action -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_action"
+                style="@style/Widget.Material3.Button"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_marginTop="32dp"
+                android:textAppearance="?attr/textAppearanceLabelLarge"
+                android:textSize="16sp"
+                app:backgroundTint="@color/md_theme_primary"
+                app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
+                app:layout_constraintStart_toStartOf="@id/guidelineStart"
+                app:layout_constraintTop_toBottomOf="@+id/tv_donation_status"
+                tools:text="Berikan Donasi" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
     </androidx.core.widget.NestedScrollView>
 
-    <!-- ProgressBar utama saat loading data awal -->
+    <!-- Progress Bar utama, tidak berubah -->
+    <!-- ID ASLI: progress_bar -->
     <ProgressBar
         android:id="@+id/progress_bar"
         android:layout_width="wrap_content"
@@ -92,14 +206,5 @@
         android:layout_gravity="center"
         android:visibility="gone"
         tools:visibility="visible" />
-
-    <!-- Tombol Aksi yang akan muncul di bawah -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_action"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_gravity="bottom"
-        android:layout_margin="16dp"
-        tools:text="Berikan Donasi" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

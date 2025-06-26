@@ -2,4 +2,5 @@
     <string name="app_name">ProjectMDP</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="donation_image_description">Gambar ilustrasi untuk kampanye donasi</string>
 </resources>

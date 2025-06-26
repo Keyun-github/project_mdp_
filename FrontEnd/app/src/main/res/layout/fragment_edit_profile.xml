@@ -4,93 +4,186 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/colorSurface"
     tools:context=".User.EditProfileFragment">
 
+    <!-- Toolbar: Dibuat netral dengan warna permukaan -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar_edit_profile"
         android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
+        android:background="?attr/colorSurface"
+        android:elevation="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:title="Edit Profil"
-        app:titleTextColor="?attr/colorOnPrimary" />
+        app:titleTextColor="?attr/colorOnSurface" />
 
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:fillViewport="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar_edit_profile">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="24dp">
+            android:paddingBottom="32dp">
 
+            <!-- Bagian Header dengan Ilustrasi (Meniru LoginFragment) -->
+            <!-- Anda bisa mengganti drawable ini dengan ilustrasi yang lebih sesuai -->
+            <ImageView
+                android:id="@+id/ivIllustrationEditProfile"
+                android:layout_width="0dp"
+                android:layout_height="230dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginEnd="32dp"
+                android:src="@drawable/il_login"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="ContentDescription" />
+
+            <TextView
+                android:id="@+id/tvTitleEditProfile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="Edit Profil"
+                android:textColor="@color/md_theme_text_primary"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@+id/guidelineStart"
+                app:layout_constraintTop_toBottomOf="@+id/ivIllustrationEditProfile" />
+
+            <TextView
+                android:id="@+id/tvSubtitleEditProfile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Perbarui informasi akun Anda"
+                android:textColor="@color/md_theme_text_secondary"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="@+id/guidelineStart"
+                app:layout_constraintTop_toBottomOf="@+id/tvTitleEditProfile" />
+
+
+            <!-- Input Fields -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/til_edit_nama"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:hint="Nama Lengkap"
+                app:boxCornerRadiusBottomEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusTopStart="16dp"
+                app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
+                app:layout_constraintStart_toStartOf="@id/guidelineStart"
+                app:layout_constraintTop_toBottomOf="@+id/tvSubtitleEditProfile"
+                app:startIconDrawable="@drawable/ic_person_filled">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/et_edit_nama"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Nama Lengkap"
                     android:inputType="textPersonName|textCapWords" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="Ganti Password (opsional)"
-                android:textAppearance="?attr/textAppearanceTitleSmall" />
+            <!--
+                NOTE: CardView (id: card_password_section) dan LinearLayout dihilangkan
+                untuk menyamakan tampilan dengan LoginFragment. Input field di bawah ini
+                sekarang berada langsung di dalam ConstraintLayout.
+            -->
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/til_old_password"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:endIconMode="password_toggle">
+                android:layout_marginTop="16dp"
+                android:hint="Password Lama"
+                app:boxCornerRadiusBottomEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusTopStart="16dp"
+                app:endIconMode="password_toggle"
+                app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
+                app:layout_constraintStart_toStartOf="@id/guidelineStart"
+                app:layout_constraintTop_toBottomOf="@+id/til_edit_nama"
+                app:startIconDrawable="@drawable/ic_lock_outline">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/et_old_password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Password Lama"
                     android:inputType="textPassword" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/til_new_password"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:endIconMode="password_toggle">
+                android:layout_marginTop="16dp"
+                android:hint="Password Baru"
+                app:boxCornerRadiusBottomEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusTopStart="16dp"
+                app:endIconMode="password_toggle"
+                app:helperText="Kosongkan jika tidak ingin mengubah password"
+                app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
+                app:layout_constraintStart_toStartOf="@id/guidelineStart"
+                app:layout_constraintTop_toBottomOf="@+id/til_old_password"
+                app:startIconDrawable="@drawable/ic_lock_outline">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/et_new_password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Password Baru"
                     android:inputType="textPassword" />
             </com.google.android.material.textfield.TextInputLayout>
 
+
+            <!-- Tombol Aksi (disamakan dengan Button Login) -->
             <Button
                 android:id="@+id/btn_save_profile"
                 style="@style/Widget.Material3.Button"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:layout_marginTop="32dp"
-                android:text="Simpan Perubahan" />
-        </LinearLayout>
+                android:backgroundTint="@color/md_theme_primary"
+                android:text="Simpan Perubahan"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
+                app:layout_constraintStart_toStartOf="@id/guidelineStart"
+                app:layout_constraintTop_toBottomOf="@+id/til_new_password" />
+
+
+            <!-- Guideline untuk padding horizontal -->
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guidelineStart"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_begin="24dp" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guidelineEnd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_end="24dp" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

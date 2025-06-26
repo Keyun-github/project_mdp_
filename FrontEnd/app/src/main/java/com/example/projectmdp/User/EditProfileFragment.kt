@@ -41,6 +41,10 @@ class EditProfileFragment : Fragment() {
 
         binding.btnSaveProfile.setOnClickListener { handleSaveProfile() }
 
+        binding.toolbarEditProfile.setNavigationOnClickListener {
+            findNavController().navigateUp()
+        }
+
         observeViewModel()
     }
 

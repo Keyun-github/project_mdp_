@@ -4,58 +4,115 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp"
+    android:background="@color/white"
     tools:context=".User.ProfileFragment">
 
+    <!-- Ilustrasi Profil (Opsional, tapi sangat disarankan untuk konsistensi) -->
+    <!-- Anda bisa menggunakan ShapeableImageView untuk foto profil bundar -->
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/ivProfile"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="48dp"
+        android:padding="4dp"
+        android:src="@drawable/ic_person_placeholder"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
+        app:strokeColor="@color/md_theme_primary"
+        app:strokeWidth="2dp" />
+
+    <!-- tv_profile_title digunakan sebagai judul utama, sama seperti di LoginFragment -->
     <TextView
         android:id="@+id/tv_profile_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
         android:text="Profil Pengguna"
-        android:textAppearance="?attr/textAppearanceHeadlineSmall"
+        android:textColor="@color/md_theme_text_primary"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/ivProfile" />
 
+
+    <!-- Data Pengguna ditampilkan dengan lebih rapi di bawah judul -->
     <TextView
         android:id="@+id/tv_profile_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:textAppearance="?attr/textAppearanceTitleMedium"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="32dp"
+        android:drawablePadding="12dp"
+        android:gravity="center_vertical"
+        android:textColor="@color/md_theme_text_primary"
+        android:textSize="16sp"
+        app:drawableStartCompat="@drawable/ic_person_24"
+        app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
+        app:layout_constraintStart_toStartOf="@id/guidelineStart"
         app:layout_constraintTop_toBottomOf="@id/tv_profile_title"
-        tools:text="Nama: John Doe" />
+        tools:text="John Doe" />
 
     <TextView
         android:id="@+id/tv_profile_email"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:textAppearance="?attr/textAppearanceBodyMedium"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="16dp"
+        android:drawablePadding="12dp"
+        android:gravity="center_vertical"
+        android:textColor="@color/md_theme_text_secondary"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
+        app:layout_constraintStart_toStartOf="@id/guidelineStart"
         app:layout_constraintTop_toBottomOf="@id/tv_profile_name"
-        tools:text="Email: john.doe@example.com" />
 
-    <com.google.android.material.button.MaterialButton
+        />
+
+
+    <!-- Tombol Aksi Utama: Edit Profil -->
+    <!-- Diubah menjadi tombol utama yang solid, sama seperti tombol Login -->
+    <Button
         android:id="@+id/btn_edit_profile"
-        style="@style/Widget.Material3.Button.OutlinedButton"
+        style="@style/Widget.Material3.Button"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:layout_marginTop="32dp"
+        android:backgroundTint="@color/md_theme_primary"
         android:text="Edit Profil"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
+        app:layout_constraintStart_toStartOf="@id/guidelineStart"
         app:layout_constraintTop_toBottomOf="@+id/tv_profile_email" />
 
-    <Button
+
+    <!-- Tombol Logout dibuat lebih subtil (TextButton) untuk aksi sekunder/destruktif -->
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_logout"
-        android:layout_width="0dp"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:text="Logout"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:textColor="@android:color/holo_red_dark"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_edit_profile" />
+
+
+    <!-- Guideline untuk padding horizontal yang konsisten -->
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineStart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="24dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineEnd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="24dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

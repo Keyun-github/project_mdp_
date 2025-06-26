@@ -21,12 +21,12 @@
     <fragment
         android:id="@+id/AIFragment"
         android:name="com.example.projectmdp.User.AIFragment"
-        android:label="fragment_a_i"
+        android:label="AI"
         tools:layout="@layout/fragment_ai" />
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.example.projectmdp.User.ProfileFragment"
-        android:label="fragment_profile"
+        android:label="Profile"
         tools:layout="@layout/fragment_profile" >
         <action
             android:id="@+id/action_profileFragment_to_editProfileFragment"
@@ -35,12 +35,12 @@
     <fragment
         android:id="@+id/addDonationFragment"
         android:name="com.example.projectmdp.User.AddDonationFragment"
-        android:label="fragment_add_donation"
+        android:label="Add Donation"
         tools:layout="@layout/fragment_add_donation" />
     <fragment
         android:id="@+id/editProfileFragment"
         android:name="com.example.projectmdp.User.EditProfileFragment"
-        android:label="fragment_edit_profile"
+        android:label="Edit Profile"
         tools:layout="@layout/fragment_edit_profile" />
 
     <!-- Deklarasi fragment detail baru -->
