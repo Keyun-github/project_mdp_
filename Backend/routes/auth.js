@@ -1,10 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../Models/User');
+const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const authMiddleware = require('../middleware/auth'); // Impor middleware di sini
 
-// REGISTER
+// ===================================
+//   ROUTE: POST /api/auth/register
+// ===================================
 router.post('/register', async (req, res) => {
   const { namaLengkap, email, password, confirmPassword } = req.body;
 
@@ -18,10 +21,10 @@ router.post('/register', async (req, res) => {
 
   try {
     const existingUser = await User.findOne({ email });
-    if (existingUser)
+    if (existingUser) {
       return res.status(400).json({ message: 'Email sudah terdaftar' });
+    }
 
-    // Tentukan role
     let role = 'donatur';
     if (email === 'master@gmail.com' && password === '12345678') {
       role = 'admin';
@@ -29,10 +32,9 @@ router.post('/register', async (req, res) => {
       role = 'organisasi';
     }
 
-    // Ambil jumlah user sesuai role
     const rolePrefix = role === 'donatur' ? 'D' : role === 'organisasi' ? 'O' : 'A';
     const count = await User.countDocuments({ role });
-    const nextNumber = (count + 1).toString().padStart(3, '0'); // 001, 002
+    const nextNumber = (count + 1).toString().padStart(3, '0');
     const customId = `${rolePrefix}${nextNumber}`;
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -46,7 +48,6 @@ router.post('/register', async (req, res) => {
     });
 
     await newUser.save();
-
     res.status(201).json({ message: 'Registrasi berhasil' });
   } catch (err) {
     console.error(err);
@@ -54,22 +55,26 @@ router.post('/register', async (req, res) => {
   }
 });
 
-
-// LOGIN
+// ===================================
+//   ROUTE: POST /api/auth/login
+// ===================================
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
-  if (!email || !password)
+  if (!email || !password) {
     return res.status(400).json({ message: 'Email dan password wajib diisi' });
+  }
 
   try {
     const user = await User.findOne({ email });
-    if (!user)
+    if (!user) {
       return res.status(400).json({ message: 'Email tidak ditemukan' });
+    }
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch)
+    if (!isMatch) {
       return res.status(400).json({ message: 'Password salah' });
+    }
 
     const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, {
       expiresIn: '1d'
@@ -82,45 +87,60 @@ router.post('/login', async (req, res) => {
         id: user._id,
         namaLengkap: user.namaLengkap,
         email: user.email,
-        role: user.role
+        role: user.role,
+        customId: user.customId
       }
     });
   } catch (err) {
     res.status(500).json({ message: 'Terjadi kesalahan server' });
   }
 });
-//get
-router.get('/users', async (req, res) => {
-  try {
-    const users = await User.find({}, '-password'); // sembunyikan password
-    res.json(users);
-  } catch (err) {
-    res.status(500).json({ message: 'Gagal mengambil data user' });
-  }
-});
-//update 
-router.put('/users/:id', async (req, res) => {
-  const { namaLengkap, email, role } = req.body;
+
+// ===================================
+//   ROUTE: PUT /api/auth/profile
+// ===================================
+router.put('/profile', authMiddleware, async (req, res) => {
+  const { namaLengkap, oldPassword, newPassword } = req.body;
+  const userId = req.user.userId;
 
   try {
-    const updatedUser = await User.findByIdAndUpdate(
-      req.params.id,
-      { namaLengkap, email, role },
-      { new: true }
-    );
-    res.json(updatedUser);
-  } catch (err) {
-    res.status(500).json({ message: 'Gagal mengupdate user' });
-  }
-});
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'Pengguna tidak ditemukan' });
+    }
 
-//delete
-router.delete('/users/:id', async (req, res) => {
-  try {
-    await User.findByIdAndDelete(req.params.id);
-    res.json({ message: 'User berhasil dihapus' });
+    if (namaLengkap) {
+      user.namaLengkap = namaLengkap;
+    }
+
+    if (newPassword && newPassword.trim() !== '') {
+      if (!oldPassword) {
+        return res.status(400).json({ message: 'Password lama wajib diisi untuk mengganti password' });
+      }
+
+      const isMatch = await bcrypt.compare(oldPassword, user.password);
+      if (!isMatch) {
+        return res.status(400).json({ message: 'Password lama salah' });
+      }
+
+      user.password = await bcrypt.hash(newPassword, 10);
+    }
+
+    const updatedUser = await user.save();
+
+    res.json({
+      message: 'Profil berhasil diperbarui',
+      user: {
+        id: updatedUser._id,
+        namaLengkap: updatedUser.namaLengkap,
+        email: updatedUser.email,
+        role: updatedUser.role,
+        customId: updatedUser.customId
+      }
+    });
   } catch (err) {
-    res.status(500).json({ message: 'Gagal menghapus user' });
+    console.error(err);
+    res.status(500).json({ message: 'Terjadi kesalahan server' });
   }
 });
 

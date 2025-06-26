@@ -7,12 +7,14 @@ import com.example.projectmdp.api.LoginRequest
 import com.example.projectmdp.api.LoginResponse
 import com.example.projectmdp.api.RegisterRequest
 import com.example.projectmdp.api.RetrofitClient
+import com.example.projectmdp.api.UpdateProfileRequest
 import com.example.projectmdp.api.UserData
 import com.example.projectmdp.db.AppDatabase
 import com.example.projectmdp.db.UserDao
 import com.example.projectmdp.db.UserEntity
+import com.example.projectmdp.utils.SessionManager
 
-class AuthRepository(context: Context) {
+class AuthRepository(private val context: Context) { // Simpan context sebagai properti kelas
 
     private val apiService: ApiService = RetrofitClient.instance
     private val userDao: UserDao = AppDatabase.getDatabase(context).userDao()
@@ -36,7 +38,6 @@ class AuthRepository(context: Context) {
             val response = apiService.loginUser(request)
             if (response.isSuccessful && response.body() != null) {
                 val loginResponse = response.body()!!
-                // Simpan data user ke database Room setelah login berhasil
                 cacheUser(loginResponse.user)
                 ResultWrapper.Success(loginResponse)
             } else {
@@ -45,6 +46,30 @@ class AuthRepository(context: Context) {
             }
         } catch (e: Exception) {
             ResultWrapper.Error(e.message ?: "Kesalahan jaringan")
+        }
+    }
+
+    suspend fun updateProfile(request: UpdateProfileRequest): ResultWrapper<LoginResponse> {
+        // ==========================================================
+        // =               BAGIAN YANG DIPERBAIKI                   =
+        // ==========================================================
+        // Gunakan 'context' yang sudah menjadi properti dari kelas ini
+        val authToken = "Bearer ${SessionManager.getAuthToken(context)}"
+
+        return try {
+            val response = apiService.updateProfile(authToken, request)
+            if (response.isSuccessful && response.body() != null) {
+                val updatedUser = response.body()!!.user
+                // Update cache di Room setelah berhasil
+                cacheUser(updatedUser)
+                // Kembalikan hasil sukses
+                ResultWrapper.Success(response.body()!!)
+            } else {
+                val errorMsg = response.errorBody()?.string() ?: "Gagal update profil"
+                ResultWrapper.Error(errorMsg)
+            }
+        } catch (e: Exception) {
+            ResultWrapper.Error(e.message ?: "Error jaringan")
         }
     }
 

@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import com.example.projectmdp.R
 import com.example.projectmdp.databinding.FragmentProfileBinding
 import com.example.projectmdp.utils.SessionManager
@@ -26,22 +27,30 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Ambil nama dari SessionManager dan tampilkan
-        val userName = SessionManager.getUserName(requireContext())
-        if (!userName.isNullOrEmpty()) {
-            binding.tvWelcomeMessage.text = "Profil: $userName"
-        } else {
-            binding.tvWelcomeMessage.text = "Profil Pengguna"
+        displayUserInfo()
+
+        binding.btnEditProfile.setOnClickListener {
+            findNavController().navigate(R.id.action_profileFragment_to_editProfileFragment)
         }
 
-        // Setup listener untuk tombol logout
         binding.btnLogout.setOnClickListener {
-            // Hapus sesi/token
-            SessionManager.clearAuthToken(requireContext())
-
+            SessionManager.clearSession(requireContext())
             requireActivity().findNavController(R.id.nav_host_fragment)
                 .navigate(R.id.action_homeUserFragment_to_loginFragment)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Perbarui info user setiap kali fragment ini ditampilkan
+        displayUserInfo()
+    }
+
+    private fun displayUserInfo() {
+        val userName = SessionManager.getUserName(requireContext())
+        binding.tvProfileName.text = "Nama: ${userName ?: "Tidak tersedia"}"
+        // Anda juga bisa menyimpan dan menampilkan email jika mau
+        // binding.tvProfileEmail.text = "Email: ..."
     }
 
     override fun onDestroyView() {

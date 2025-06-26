@@ -4,15 +4,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.projectmdp.api.GenericResponse
-import com.example.projectmdp.api.LoginRequest
-import com.example.projectmdp.api.LoginResponse
-import com.example.projectmdp.api.RegisterRequest
+import com.example.projectmdp.api.*
 import com.example.projectmdp.repository.AuthRepository
 import com.example.projectmdp.repository.ResultWrapper
 import kotlinx.coroutines.launch
 
-// Sealed class untuk merepresentasikan state UI
 sealed class ApiResult<out T> {
     data class Success<out T>(val data: T) : ApiResult<T>()
     data class Error(val message: String) : ApiResult<Nothing>()
@@ -27,15 +23,15 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
     private val _loginResult = MutableLiveData<ApiResult<LoginResponse>>()
     val loginResult: LiveData<ApiResult<LoginResponse>> = _loginResult
 
+    private val _updateProfileResult = MutableLiveData<ApiResult<LoginResponse>>()
+    val updateProfileResult: LiveData<ApiResult<LoginResponse>> = _updateProfileResult
+
     fun registerUser(request: RegisterRequest) {
         viewModelScope.launch {
             _registrationResult.value = ApiResult.Loading
-
             val result = repository.register(request)
-
             if (result is ResultWrapper.Success) {
                 _registrationResult.value = ApiResult.Success(result.data)
-                // Lakukan login otomatis di background untuk menyimpan data ke Room
                 val loginRequest = LoginRequest(request.email, request.password)
                 repository.loginAndCacheUser(loginRequest)
             } else if (result is ResultWrapper.Error) {
@@ -47,13 +43,23 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
     fun loginUser(request: LoginRequest) {
         viewModelScope.launch {
             _loginResult.value = ApiResult.Loading
-
             val result = repository.loginAndCacheUser(request)
-
             if (result is ResultWrapper.Success) {
                 _loginResult.value = ApiResult.Success(result.data)
             } else if (result is ResultWrapper.Error) {
                 _loginResult.value = ApiResult.Error(result.message)
+            }
+        }
+    }
+
+    fun updateUserProfile(request: UpdateProfileRequest) {
+        viewModelScope.launch {
+            _updateProfileResult.value = ApiResult.Loading
+            val result = repository.updateProfile(request)
+            if (result is ResultWrapper.Success) {
+                _updateProfileResult.value = ApiResult.Success(result.data)
+            } else if (result is ResultWrapper.Error) {
+                _updateProfileResult.value = ApiResult.Error(result.message)
             }
         }
     }
