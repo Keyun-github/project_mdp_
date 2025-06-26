@@ -5,5 +5,7 @@
         <domain includeSubdomains="true">192.168.101.86</domain>
         //meme
         <domain includeSubdomains="true">192.168.100.236</domain>
+
+        <domain includeSubdomains="true">192.168.101.81</domain>
     </domain-config>
 </network-security-config>
