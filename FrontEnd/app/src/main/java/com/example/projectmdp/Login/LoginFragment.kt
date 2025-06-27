@@ -12,6 +12,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.projectmdp.R
 import com.example.projectmdp.api.LoginRequest
 import com.example.projectmdp.databinding.FragmentLoginBinding
+import com.example.projectmdp.utils.LoginValidationUtils
 import com.example.projectmdp.utils.SessionManager
 
 class LoginFragment : Fragment() {
@@ -56,18 +57,31 @@ class LoginFragment : Fragment() {
         observeViewModel()
     }
 
-    private fun handleLogin() {
-        val email = binding.etEmail.text.toString().trim()
-        val password = binding.etPassword.text.toString()
+//    private fun handleLogin() {
+//        val email = binding.etEmail.text.toString().trim()
+//        val password = binding.etPassword.text.toString()
+//
+//        if (email.isEmpty() || password.isEmpty()) {
+//            Toast.makeText(requireContext(), "Email dan Password tidak boleh kosong", Toast.LENGTH_SHORT).show()
+//            return
+//        }
+//
+//        val loginRequest = LoginRequest(email, password)
+//        authViewModel.loginUser(loginRequest)
+//    }
+private fun handleLogin() {
+    val email = binding.etEmail.text.toString().trim()
+    val password = binding.etPassword.text.toString()
 
-        if (email.isEmpty() || password.isEmpty()) {
-            Toast.makeText(requireContext(), "Email dan Password tidak boleh kosong", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val loginRequest = LoginRequest(email, password)
-        authViewModel.loginUser(loginRequest)
+    val errorMessage = LoginValidationUtils.validateLoginInput(email, password)
+    if (errorMessage != null) {
+        Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
+        return
     }
+
+    val loginRequest = LoginRequest(email, password)
+    authViewModel.loginUser(loginRequest)
+}
 
     private fun observeViewModel() {
         authViewModel.loginResult.observe(viewLifecycleOwner) { result ->
