@@ -16,6 +16,7 @@ import com.example.projectmdp.Login.AuthViewModel
 import com.example.projectmdp.Login.AuthViewModelFactory
 import com.example.projectmdp.api.UpdateProfileRequest
 import com.example.projectmdp.databinding.FragmentEditProfileBinding
+import com.example.projectmdp.utils.EditProfileValidationUtils
 import com.example.projectmdp.utils.SessionManager
 
 class EditProfileFragment : Fragment() {
@@ -53,14 +54,9 @@ class EditProfileFragment : Fragment() {
         val oldPassword = binding.etOldPassword.text.toString()
         val newPassword = binding.etNewPassword.text.toString()
 
-        if (namaLengkap.isEmpty()) {
-            Toast.makeText(context, "Nama tidak boleh kosong", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        // Validasi jika pengguna ingin mengganti password
-        if (newPassword.isNotEmpty() && oldPassword.isEmpty()) {
-            Toast.makeText(context, "Masukkan password lama untuk mengganti password", Toast.LENGTH_SHORT).show()
+        val errorMessage = EditProfileValidationUtils.validateEditProfileInput(namaLengkap, oldPassword, newPassword)
+        if (errorMessage != null) {
+            Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
             return
         }
 

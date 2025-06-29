@@ -25,7 +25,10 @@ object RetrofitClient {
 
     private val json = Json { ignoreUnknownKeys = true }
 
-    private const val APP_BASE_URL = "http://192.168.1.67:3000/"
+//    private const val APP_BASE_URL = "http://192.168.1.67:3000/"
+//    ip meme
+private const val APP_BASE_URL = "http://192.168.100.236:3000/"
+
 
     val instance: ApiService by lazy {
         Retrofit.Builder()

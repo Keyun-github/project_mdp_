@@ -13,6 +13,7 @@ import androidx.navigation.ui.NavigationUI
 import com.example.projectmdp.Login.ApiResult
 import com.example.projectmdp.databinding.FragmentAddDonationBinding
 import com.example.projectmdp.api.CreateDonationRequest
+import com.example.projectmdp.utils.DonationValidationUtils
 import com.example.projectmdp.utils.SessionManager
 
 class AddDonationFragment : Fragment() {
@@ -40,13 +41,15 @@ class AddDonationFragment : Fragment() {
             val targetStr = binding.etDonationTarget.text.toString().trim()
             val creatorName = SessionManager.getUserName(requireContext()) ?: "Anonim"
 
-            if(title.isEmpty() || targetStr.isEmpty()) {
-                Toast.makeText(context, "Semua field harus diisi", Toast.LENGTH_SHORT).show()
+            val errorMessage = DonationValidationUtils.validateDonationInput(title, targetStr)
+            if (errorMessage != null) {
+                Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             val request = CreateDonationRequest(title, targetStr.toLong(), creatorName)
             viewModel.addNewDonation(request)
+
         }
 
         viewModel.createStatus.observe(viewLifecycleOwner) { result ->
